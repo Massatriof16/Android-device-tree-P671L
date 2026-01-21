@@ -5,6 +5,6 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifeq ($(TARGET_DEVICE),tssi_arm64_itel)
+ifeq ($(TARGET_DEVICE),P671L)
 include $(call all-subdir-makefiles,$(LOCAL_PATH))
 endif

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-DEVICE_PATH := device/itel/tssi_arm64_itel
+DEVICE_PATH := device/itel/P671L
 
 # A/B
 AB_OTA_UPDATER := true

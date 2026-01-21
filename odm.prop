@@ -42,7 +42,6 @@ ro.recovery.ui.margin_height=45
 ro.vendor.gnsschip=marlin3lite-Integ
 ro.vendor.ifaa.support=false
 ro.vendor.soter.support=false
-ro.vendor.tran.anti.crack.p7.support=1
 ro.vendor.tui.support=false
 ro.vendor.wcn.gpschip=marlin3lite-Integ
 ro.vendor.wcn.hardware.product=marlin3_internal

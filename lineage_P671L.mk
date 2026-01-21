@@ -8,15 +8,15 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
 # Inherit from tssi_arm64_itel device
-$(call inherit-product, device/itel/tssi_arm64_itel/device.mk)
+$(call inherit-product, device/itel/P671L/device.mk)
 
 # Inherit some common Lineage stuff.
 $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 
-PRODUCT_DEVICE := tssi_arm64_itel
-PRODUCT_NAME := lineage_tssi_arm64_itel
+PRODUCT_DEVICE := P671L
+PRODUCT_NAME := lineage_P671L
 PRODUCT_BRAND := Itel
-PRODUCT_MODEL := tssi
+PRODUCT_MODEL := P671L
 PRODUCT_MANUFACTURER := itel
 
 PRODUCT_GMS_CLIENTID_BASE := android-transsion

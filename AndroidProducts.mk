@@ -4,9 +4,9 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_tssi_arm64_itel.mk
+    $(LOCAL_DIR)/lineage_P671L.mk
 
 COMMON_LUNCH_CHOICES := \
-    lineage_tssi_arm64_itel-user \
-    lineage_tssi_arm64_itel-userdebug \
-    lineage_tssi_arm64_itel-eng
+    lineage_P671L-user \
+    lineage_P671L-userdebug \
+    lineage_P671L-eng

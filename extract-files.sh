@@ -8,7 +8,7 @@
 
 set -e
 
-DEVICE=tssi_arm64_itel
+DEVICE=P671L
 VENDOR=itel
 
 # Load extract_utils and do some sanity checks
