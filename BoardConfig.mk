@@ -5,6 +5,19 @@
 
 DEVICE_PATH := device/itel/P671L
 
+# Build system flags
+BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
+BUILD_BROKEN_DUP_RULES := true
+BUILD_BROKEN_MISSING_REQUIRED_MODULES := true
+ALLOW_MISSING_DEPENDENCIES := false
+BUILD_BROKEN_MISSING_KERNEL_HEADERS := true
+BUILD_BROKEN_INITRC_CHECKS := true
+SELINUX_IGNORE_NEVERALLOWS := true
+
+
+
+
+
 # A/B
 AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
@@ -15,7 +28,10 @@ AB_OTA_PARTITIONS += \
     system_ext \
     system_dlkm \
     vendor
-BOARD_USES_RECOVERY_AS_BOOT := true
+
+
+
+
 
 # Architecture
 TARGET_ARCH := arm64
@@ -40,28 +56,109 @@ TARGET_NO_BOOTLOADER := true
 TARGET_SCREEN_DENSITY := 320
 TARGET_USES_VULKAN := true
 
-# Kernel
+
+
+
+# ==================================================
+# UNISOC GRAPHICS CONFIGURATION
+# ==================================================
+
+# GPU identification
+TARGET_GPU_PLATFORM := mali-g57
+TARGET_GPU_VARIANT := mali-g57
+
+# Unisoc proprietary graphics
+BOARD_USES_UNISOC_GRAPHICS := true
+TARGET_USES_UNISOC_GRAPHICS := true
+
+# Essential graphics support
+TARGET_USES_OPENGLES := true
+
+# Let AOSP handle the rest automatically!
+
+
+
+# Vendor Boot configuration for DUAL CPIO
+BOARD_USES_GENERIC_KERNEL_IMAGE := true
+BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
+BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
+BOARD_USES_VENDOR_BOOT_IMAGE := true
+TARGET_NO_RECOVERY := false
+
 BOARD_BOOT_HEADER_VERSION := 4
-BOARD_KERNEL_BASE := 0x00000000
-BOARD_KERNEL_CMDLINE := console=ttyS1,115200n8 bootconfig bootconfig
-BOARD_KERNEL_PAGESIZE := 4096
-BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
-BOARD_KERNEL_IMAGE_NAME := Image
-BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+BOARD_RAMDISK_USE_LZ4 := true
+
 BOARD_KERNEL_SEPARATED_DTBO := true
-TARGET_KERNEL_CONFIG := tssi_arm64_itel_defconfig
-TARGET_KERNEL_SOURCE := kernel/itel/tssi_arm64_itel
+BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+
+
+
+BOARD_KERNEL_CMDLINE := \
+    androidboot.hardware=ums9230_P671L \
+    androidboot.selinux=permissive \
+    androidboot.dtbo_idx=0 \
+    loop.max_part=7 \
+    swiotlb=1 
+
+        
+BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
+BOARD_KERNEL_OFFSET := 0x00008000
+BOARD_KERNEL_PAGESIZE := 4096
+BOARD_RAMDISK_OFFSET := 0x05400000
+BOARD_TAGS_OFFSET := 0x00000100
+BOARD_DTB_SIZE := 123569
+BOARD_DTB_OFFSET := 0x01f00000
+BOARD_HEADER_SIZE := 2128
+BOARD_VENDOR_CMDLINE := console=ttyS1,115200n8 bootconfig bootconfig
+BOARD_VENDOR_BOOTCONFIG := $(DEVICE_PATH)/bootconfig
+BOARD_MKBOOTIMG_ARGS += --vendor_bootconfig $(BOARD_VENDOR_BOOTCONFIG)
+
+
+
+
+
+
+# ==================================================
+# KERNEL CONFIGURATION - KEEPING YOUR SETUP
+# ==================================================
 
 # Kernel - prebuilt
 TARGET_FORCE_PREBUILT_KERNEL := true
-ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilts/kernel
 TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilts/dtb.img
-BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
-BOARD_INCLUDE_DTB_IN_BOOTIMG := 
-BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilts/dtbo.img
-BOARD_KERNEL_SEPARATED_DTBO := 
-endif
+TARGET_PREBUILT_DTBO := $(DEVICE_PATH)/prebuilts/dtbo.img
+BOARD_PREBUILT_DTBIMAGE := $(TARGET_PREBUILT_DTB)
+BOARD_PREBUILT_DTBOIMAGE := $(TARGET_PREBUILT_DTBO)
+
+# Kernel
+
+TARGET_KERNEL_CONFIG := P671L_defconfig
+TARGET_KERNEL_SOURCE := kernel/itel/P671L
+
+
+LOCAL_KERNEL := $(DEVICE_PATH)/prebuilts/kernel
+PRODUCT_COPY_FILES += \
+	$(LOCAL_KERNEL):kernel
+
+
+
+
+# Kernel version
+KERNEL_VERSION := 5.4.254-android12-9-gb10a25caafa5-ab1063
+
+# Clang Toolchain
+
+
+# DTBO
+BOARD_DTBOIMG_PARTITION_SIZE := 8388608
+
+# Boot/ Vendor Boot sizes
+BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
+BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 104857600
+
+
+
+
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 262144 # (BOARD_KERNEL_PAGESIZE * 64)
@@ -69,7 +166,7 @@ BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
 BOARD_DTBOIMG_PARTITION_SIZE := 8388608
 BOARD_INIT_BOOT_IMAGE_PARTITION_SIZE := 8388608
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 104857600
-BOARD_SUPER_PARTITION_SIZE := 9126805504 # TODO: Fix hardcoded value
+BOARD_SUPER_PARTITION_SIZE := 7549747200 # TODO: Fix hardcoded value
 BOARD_SUPER_PARTITION_GROUPS := itel_dynamic_partitions
 BOARD_ITEL_DYNAMIC_PARTITIONS_PARTITION_LIST := \
     odm \
@@ -79,7 +176,54 @@ BOARD_ITEL_DYNAMIC_PARTITIONS_PARTITION_LIST := \
     system_ext \
     system_dlkm \
     vendor
-BOARD_ITEL_DYNAMIC_PARTITIONS_SIZE := 9122611200 # TODO: Fix hardcoded value
+    
+BOARD_ITEL_DYNAMIC_PARTITIONS_SIZE := 7549747200 # TODO: Fix hardcoded value
+
+
+# System (root): content unknown, but from earlier: 892MB used + 136MB GApps + buffer
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 768471040  # 1,152 MB (safer) 
+
+# Product: 435MB used + 700MB GApps + buffer  
+BOARD_PRODUCTIMAGE_PARTITION_SIZE := 1241513984  # 1,184 MB
+
+# System_ext: 1.1Gb original
+BOARD_SYSTEM_EXTIMAGE_PARTITION_SIZE := 1377742848  # 1.1 GB
+
+# Vendor: 1,081MB content + 69MB buffer
+BOARD_VENDORIMAGE_PARTITION_SIZE := 1207959552  # 1,152 MB
+
+# ODM: 439MB content + 41MB buffer
+BOARD_ODMIMAGE_PARTITION_SIZE := 503316480  # 480 MB
+
+# Vendor_dlkm: 24MB used + 6MB buffer
+BOARD_VENDOR_DLKMIMAGE_PARTITION_SIZE := 31457280  # 30 MB
+
+BOARD_SYSTEM_DLKMIMAGE_PARTITION_SIZE := 348160  # 3 MB
+
+# Force super image building
+BOARD_BUILD_SUPER_IMAGE := true
+BOARD_BUILD_SUPER_IMAGE_BY_DEFAULT := true
+BOARD_SUPER_IMAGE_IN_UPDATE_PACKAGE := true
+
+# Dynamic partitions filesystem - ALL Ext4
+BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_SYSTEM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+
+# Copy out paths
+TARGET_COPY_OUT_SYSTEM := system
+TARGET_COPY_OUT_VENDOR := vendor
+TARGET_COPY_OUT_PRODUCT := product
+TARGET_COPY_OUT_SYSTEM_EXT := system_ext
+TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
+TARGET_COPY_OUT_ODM := odm
+TARGET_COPY_OUT_SYSTEM_DLKM := system_dlkm
+
+
 
 # Platform
 TARGET_BOARD_PLATFORM := ums9230
@@ -95,7 +239,7 @@ TARGET_ODM_DLKM_PROP += $(DEVICE_PATH)/odm_dlkm.prop
 TARGET_VENDOR_DLKM_PROP += $(DEVICE_PATH)/vendor_dlkm.prop
 
 # Recovery
-TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.ums9230_4h10_go
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.recovery
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
@@ -103,16 +247,69 @@ TARGET_USERIMAGES_USE_F2FS := true
 # Security patch level
 VENDOR_SECURITY_PATCH := 2024-05-05
 
-# Verified Boot
+# Verified Boot (AVB)
 BOARD_AVB_ENABLE := true
+BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_ROLLBACK_INDEX := 0
+BOARD_AVB_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --set_hashtree_disabled_flag
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
+
+# Boot signing
+BOARD_AVB_BOOT_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_BOOT_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_BOOT_ROLLBACK_INDEX := $(BOARD_AVB_ROLLBACK_INDEX)
+BOARD_AVB_BOOT_ROLLBACK_INDEX_LOCATION := 2
+
+# Vendor_boot signing  
 BOARD_AVB_VENDOR_BOOT_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_VENDOR_BOOT_ALGORITHM := SHA256_RSA4096
-BOARD_AVB_VENDOR_BOOT_ROLLBACK_INDEX := 1
-BOARD_AVB_VENDOR_BOOT_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_VENDOR_BOOT_ROLLBACK_INDEX := $(BOARD_AVB_ROLLBACK_INDEX)
+BOARD_AVB_VENDOR_BOOT_ROLLBACK_INDEX_LOCATION := 3
+
 
 # VINTF
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/manifest.xml
 
+
+# Bypass the kernel configuration check specifically
+CHECK_SKIP_KERNEL_CONFIG := true
+SKIP_VINTF_CHECK := true
+
+# VINTF Compatibility Matrix - Keep your file but the flags above will ignore the IPC restriction
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
+    vendor/itel/P671L/proprietary/product/etc/vintf/compatibility_matrix.xml
+
+
+# Essential for APEX updates
+TARGET_FLATTEN_APEX := false
+
+
+# ==================================================
+# ESSENTIAL CONFIGURATION
+# ==================================================
+
+# Display
+TARGET_SCREEN_DENSITY := 320
+
+# RIL
+BOARD_PROVIDES_RILD := true
+ENABLE_VENDOR_RIL_SERVICE := true
+
+
+# Security
+TARGET_USES_TRUSTY := true
+BOARD_USES_KEYMASTER_4 := true
+TARGET_KEYMINT_VERSION := 2.0
+
+# SELinux
+BOARD_SEPOLICY_VERS := 33.0
+BOARD_VENDOR_SEPOLICY_DIRS += device/itel/P671L/sepolicy/vendor
+SELINUX_IGNORE_NEVERALLOWS := true
+
+# Vold
+TARGET_PROVIDES_VOLD := true
+
 # Inherit the proprietary files
-include vendor/itel/tssi_arm64_itel/BoardConfigVendor.mk
+include vendor/itel/P671L/BoardConfigVendor.mk

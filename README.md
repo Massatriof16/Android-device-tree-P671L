@@ -1,4 +1,4 @@
-# Android device tree for Itel tssi (tssi_arm64_itel)
+# Android device tree for Itel P65(P671L)
 
 ```
 #
